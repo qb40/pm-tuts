@@ -1,0 +1,210 @@
+                     -= PMode Tutorials in C & ASM =-
+                       by Alexei A. Frounze (c) 2000
+
+
+                            -= Disclaimer =-
+
+  PMode Tutorials in C & ASM
+  Copyright (C) 2000 Alexei A. Frounze
+
+  This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+                           -= Introduction =-
+
+  I've started out this series of the PMode tutorials just for making PMode
+more clear and easier to learn. Complexity level of the tutorials 
+increases from first tutes to last ones. It makes easier to get into
+PMode. A beginner is supposed to learn PMode step by step.
+
+
+                          -= Why C and ASM ? =-
+
+  Since pure assembly implies a lot of source code, starting something
+completely new (PMode, for example) is very difficult with ASM. So I decided
+to make the tutorials in C with a little of ASM. Such tutorials are about
+2 times shorter than tutorials made in pure ASM. I think it's very handy
+for a beginner. (s)he won't get lost in tons of the sources.
+
+
+                  -= Why Turbo C 2.01 and NASM 0.98 ? =-
+
+  Turbo C 2.01 and NASM 0.98 are available for free. Hence, anyone who
+wants to learn from my tutorials and make his/her own stuff using them,
+can have them absolutely for free. Actually, there is yet another free 
+16-bit C compiler available from Borland: Turbo C++ 1.01, which is much better 
+due to improvements in IDE and syntax extensions to language. Needless to say, 
+we don't use OOP features of TC++. :)
+
+
+                      -= Turbo C 2.01 Limitations =-
+
+  Since Turbo C 2.01 is a pretty outdated completely 16-bit compiler,
+you may notice some problems with 32-bit values... For example,
+when your program works in PMode, you're unable to use arithmetical shifts
+for 32-bit (long) integers. That's because these shifts are made as
+run-time C library subroutines and each such shift implies a far call to
+a subroutine. And such far calls are not allowed in protected mode because
+real mode segment values don't work in PMode. Be carful with 32-bit shifts,
+muls, divs. If you have Borland C/C++ 3.1, it's possible to avoid this
+problem because this compiler is capable to generate 32-bit instructions for
+32-bit arithmetics. The mentioned limitations hold for Turbo C++ 1.01 as well 
+as for Turbo C 2.01. 
+
+
+
+                         -= System Requirements =-
+
+  - 386 or a better computer
+  - DOS 5.0+ or Windows 9x in command line prompt mode 
+    (don't mess with DOS box)
+  - Absence of such drivers as EMM386.EXE (and sometimes HIMEM.SYS)
+  - 1MB RAM (sometimes a bit more)
+  - (S)VGA card
+
+
+             -= Where do I get Turbo C 2.01 and NASM 0.98 ? =-
+
+  Turbo C 2.01 and Turbo C++ 1.01 are available at Inprise web site:
+    http://community.borland.com/museum/
+  You must register before the downloading.
+
+  NASM (Netwide Assembler) 0.98 is available from:
+    http://www.cryogen.com/nasm
+
+
+                          -= Acknowledgements =-
+
+  Thanks to Prashant TR <tr@midpec.com> for his useful suggestions and
+present and further work on documentation for this package.
+
+
+                         -= Contact Information =-
+
+  Author name: Alexei A. Frounze
+  E-mail     : alexfru@chat.ru
+  Homepage   : http://alexfru.chat.ru
+  Mirror     : http://members.xoom.com/alexfru
+
+  Special e-mail and web addresses for these tutorials:
+  E-mail      : pmode@welcome.to
+  Mailing list: pmode@egroups.com
+  Homepage    : http://welcome.to/pmode
+
+
+                           -= Tutorials List =-
+
+TUT01   Switches to PMode and back to real mode using CR0. On startup CPU
+        mode is checked using SMSW instruction. Bit 0 equals 0, if real mode
+        and 1, if PMode/V86. This is done to avoid conflicts with EMM386 and
+        similar drivers and Windows.
+
+TUT02   Sets up GDT, goes to PMode, prints "Hello from PMode!" and goes back.
+
+TUT03   The same GDT as before, IDT is setup for software ISR (Int 20h) and 
+        divide by zero exception (Int 0). Tut shows work of these handlers.
+        Note, these handlers are defined as 286 ones (see ACS_INT_GATE in the
+        PM_DEFS.H file).
+
+TUT04   The same GDT as before, IDT is setup for all exceptions, 
+        you may now see type and address of an exception. Try different
+        exceptions and see what's going on.
+        Note, all handlers are defined as 386 ones now.
+        Note #2: since all exception handler wrappers call one common
+        exception handler and there is no additional stack provided, stack 
+        faults are not handled properly. Basically such a design is good
+        for GPFs, TSS exception and similar things.
+
+TUT05   The same GDT as before, almost the same IDT as in TUT04. Two IDT
+        entries and IRQ handlers are added -- IRQ0 (timer) and
+        IRQ1 (keyboard). The tut reprograms PIC in order to handle IRQs
+        in PMode.
+
+TUT06   Almost the same as TUT05. Task switching is added. main() switches
+        to task() using a jump to TSS. Then task() waits for the ESC key.
+        After ESC, task() switches back to main(). Both tasks are PL#0.
+        Note, for such PL#0 tasks I/O map is not needed in TSS. Since there
+        are only PL#0 tasks, there is no need to setup stacks for interlevel
+        calls (SS0:ESP0,SS1:ESP1,SS2:ESP2).
+
+TUT07   Multitasking again. 3 PL#0 tasks (main(), task1(), task2()) work now.
+        Task switches are scheduled by a scheduler called from timer IRQ ISR.
+        I.e. preemptive multitasking.
+
+TUT08   Demo of page translation. The demo shows 16 color bars in 3 cases:
+        1. page translation disabled (linear addresses equal physical ones)
+           Bars are drawn in the black, blue, ... yellow, white order
+        2. page translation enabled (linear addresses equal physical ones)
+           Bars are drawn in the black, blue, ... yellow, white order
+        3. page translation enabled (linear addresses don't equal physicals)
+           Bars are drawn in the opposite order: white,yellow,...,blue,black
+        BUG FIXED (21 June, 2000): Page Translation Cache is flushed after
+        page table has been modifyied.
+        2nd change (1 July, 2000): page translation cache is flushed
+        during swiching from PMode to real mode using "MOV CR3, zero value".
+
+TUT09   Back to preemptive multitasking... :-) This tutorial is a bit
+        different to TUT07. It doesn't use TSS for task switchings now.
+        It uses stack-based switching instead. People say it's faster than
+        TSS-based method. Dunno, perhaps they're correct. MS Windows
+        uses this stuff a lot. Btw, this method also applicable to almost any
+        CPU. Even PC/XT made on 8086/8088 CPUs could have such task
+        switching. ;-)
+
+TUT10   Well, let's have a rest. :-) This tutorial shows Big/Unreal Mode,
+        i.e. accessing RAM in real mode with use of just a 32-bit offset.
+        Yeah, it's really possible. In fact, you may access up to 4GB
+        of RAM from Real mode this way.
+
+TUT11   It's almost the same as TUT07. The only difference is that task1()
+        and task2() tasks are 32-bit (32-bit code segments with 32-bit
+        instructions) and these tasks are in privilege level 3, IOPL=3 too.
+        New GDT entires added for PL#3 code and data segments respectively.
+        Screen segment is also redefined as PL#3.
+
+TUT12   The same as TUT11. 2 LDTs are added for each PL#3 task.
+
+TUT13   Multitasking. First time we run a Virtual 8086 machine here.
+
+TUT14   Advanced V86 stuff. A software Int nn is now supported for V86 tasks.
+
+TUT15   A working V86 monitor. It redirects IRQs to the V86 task now. So we
+        have our DOS stuff in V86 mode just like a DOS-box in Windows. An
+        asterisk flashing at the top-right corner of the screen tells you're
+        in V86 mode. You may try to type "dir" or run any real-mode program.
+
+TUT16   The same V86 monitor. Quite a few changes (Int 1 -- single-step trap
+        is now passed to V86 task). It's possible to debug a real-mode
+        program using DEBUG.EXE (MSDOS debugger), TD.EXE (Borland Turbo
+        Debugger) or built-in debuggers such as in Turbo Pascal or Turbo C. 
+
+TUT17   is based on TUT07 and has TSS-based multitasking. There are two
+        tasks: main() and task(). main() is PL#0, task() is PL#3. The
+        tutorial shows the use of a call gate. The PL#3 task calls to a PL#0
+        procedure. This is an important thing for OS deelopment because
+        it provides access from user application programs to OS service
+        functions.
+
+                               -= Changes =-
+
+  1 July, 2000
+- NMIs are disabled before switching to PMode and enabled after
+  switching back to real mode (in all tutorials)
+- BIOS timer (dword at 40h:6ch) is now updated, if a program takes some
+  time (in all tutorials)
+- The package is now GPL'ed
+
+  3 July, 2000
+- TUT17 added

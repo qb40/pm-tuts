@@ -1,0 +1,35 @@
+#############################################################
+# makefile for TC 2.01 and NASM 0.98                        #
+# The C compiler, NASM and TLINK must be available via the  #
+# PATH variable. Make sure TC_PATH is correct (see below).  #
+#############################################################
+
+TUT_NAME=tut16
+
+TC_PATH=c:\tc
+LIB_PATH=$(TC_PATH)\lib
+
+CC=tcc.exe
+CC_OPTIONS=-1 -k -c -k -ms
+
+ASM=nasm.exe
+ASM_OPTIONS=-f obj
+
+LINK=tlink.exe
+LINK_OPTIONS=/c /x
+
+$(TUT_NAME).exe: $(TUT_NAME).obj pm.obj isr_wrap.obj
+        @$(LINK) $(LINK_OPTIONS) $(LIB_PATH)\c0s $(TUT_NAME) pm isr_wrap, $(TUT_NAME),, $(LIB_PATH)\cs.lib
+
+$(TUT_NAME).obj: $(TUT_NAME).c pm.h pm_defs.h isr_wrap.h
+        @$(CC) $(CC_OPTIONS) $(TUT_NAME).c
+
+pm.obj: pm.asm pm.h
+        @$(ASM) pm.asm $(ASM_OPTIONS)
+
+isr_wrap.obj: isr_wrap.asm isr_wrap.h
+        @$(ASM) isr_wrap.asm $(ASM_OPTIONS)
+
+clean:
+        make
+        del *.obj
